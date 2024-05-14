@@ -9,6 +9,13 @@ use crate::package::PackageJson;
 use std::path::Path;
 use std::fs::File;
 use std::io::Read;
+use colored::*;
+use regex::Regex;
+
+fn remove_html_tags(text: &str) -> String {
+    let re = Regex::new(r"<[^>]*>").unwrap();
+    re.replace_all(text, "").to_string()
+}
 
 #[tokio::main]
 async fn main() {
@@ -29,20 +36,24 @@ async fn main() {
 
     if let Some(dependencies) = package_json.dependencies {
         for (name, _) in dependencies {
+            let key_colored = name.black().bold().on_magenta(); 
             if let Some(description) = fetch_description(&name).await {
-                println!("{}: {}", name, description);
+                let cleaned_description = remove_html_tags(&description);
+                println!("{}: {}", key_colored, cleaned_description);
             } else {
-                println!("{}: No description found", name);
+                println!("{}: No description found", key_colored);
             }
         }
     }
 
     if let Some(dev_dependencies) = package_json.devDependencies {
         for (name, _) in dev_dependencies {
+            let key_colored = name.black().bold().on_blue(); 
             if let Some(description) = fetch_description(&name).await {
-                println!("{}: {}", name, description);
+                let cleaned_description = remove_html_tags(&description);
+                println!("{}: {}", key_colored, cleaned_description);
             } else {
-                println!("{}: No description found", name);
+                println!("{}: No description found", key_colored);
             }
         }
     }
