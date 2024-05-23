@@ -24,7 +24,7 @@ async fn main() {
     let file_path = matches.get_one::<String>("file").map_or("package.json", String::as_str);
 
     if !Path::new(file_path).exists() {
-        eprintln!("File {} does not exist", file_path);
+        eprintln!("{}", "======================================= \n 😩 No package.json found!\n=======================================".red().bold());
         std::process::exit(1);
     }
 
